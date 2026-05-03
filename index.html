@@ -6,7 +6,7 @@
 <meta name="description" content="Find out which local AI models you can run on your hardware. Enter your specs or pick a preset device like Mac Mini, Raspberry Pi and more.">
 <meta name="keywords" content="local AI models, run AI locally, llama hardware requirements, ollama compatible hardware, local LLM checker">
 <meta property="og:title" content="LocalAICalc — Find AI Models You Can Run Locally">
-<meta property="og:description" content="Find out which llms your hardware can run.">
+<meta property="og:description" content="Find out which llms your hardware can run">
 <meta property="og:url" content="https://localaicalc.xyz">
 <meta name="robots" content="index, follow">
 <title>LocalAICalc</title>
@@ -134,7 +134,6 @@
     font-family: 'Space Mono', monospace;
   }
 
-  /* SPEC PANEL */
   .spec-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -216,7 +215,6 @@
 
   .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
 
-  /* PRESET MACHINES */
   .preset-section { }
 
   .preset-grid {
@@ -264,7 +262,6 @@
     font-family: 'Space Mono', monospace;
   }
 
-  /* RESULTS */
   .results-section { display: none; }
   .results-section.visible { display: block; }
 
@@ -372,7 +369,6 @@
     color: var(--text);
   }
 
-  /* MODAL */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -459,7 +455,6 @@
 
   .btn-primary-modal:hover { background: #6d28d9; }
 
-  /* CONTENT AREA with sidebar */
   .content-layout {
     display: grid;
     grid-template-columns: 1fr 300px;
@@ -520,7 +515,6 @@
   <div class="content-layout">
     <div class="left-col">
 
-      <!-- SPEC INPUT -->
       <div class="spec-panel" style="margin-bottom:40px">
         <div class="spec-title">Enter Your <span>Specs</span></div>
         <div class="spec-desc">Tell us what you've got — we'll show what AI models you can actually run.</div>
@@ -707,13 +701,11 @@
         <button class="btn-primary" onclick="checkSpecs()">⚡ Find Compatible Models</button>
       </div>
 
-      <!-- PRESET MACHINES -->
       <div class="preset-section">
         <h2>— Or Pick a Preset Device</h2>
         <div class="preset-grid" id="presetGrid"></div>
       </div>
 
-      <!-- RESULTS -->
       <div class="results-section" id="resultsSection" style="margin-top:40px">
         <div class="results-header">
           <div class="results-title" id="resultsTitle">Compatible Models</div>
@@ -756,7 +748,6 @@
   </div>
 </main>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModalBtn()">✕</button>
@@ -772,12 +763,10 @@
 </div>
 
 <script>
-// ===== GPU VRAM + BANDWIDTH MAP =====
-// vram in GB, bw = memory bandwidth GB/s (used for tok/s estimate)
+
 const GPU_SPECS = {
   none:         { vram: 0,  bw: 50,   label: "CPU" },
   apple_silicon:{ vram: 0,  bw: 200,  label: "Apple Silicon" },
-  // RTX 20
   rtx2060:      { vram: 6,  bw: 336,  label: "RTX 2060" },
   rtx2060s:     { vram: 8,  bw: 448,  label: "RTX 2060 Super" },
   rtx2070:      { vram: 8,  bw: 448,  label: "RTX 2070" },
@@ -785,7 +774,6 @@ const GPU_SPECS = {
   rtx2080:      { vram: 8,  bw: 448,  label: "RTX 2080" },
   rtx2080s:     { vram: 8,  bw: 496,  label: "RTX 2080 Super" },
   rtx2080ti:    { vram: 11, bw: 616,  label: "RTX 2080 Ti" },
-  // RTX 30
   rtx3050:      { vram: 8,  bw: 224,  label: "RTX 3050" },
   rtx3060:      { vram: 12, bw: 360,  label: "RTX 3060" },
   rtx3060ti:    { vram: 8,  bw: 448,  label: "RTX 3060 Ti" },
@@ -795,7 +783,6 @@ const GPU_SPECS = {
   rtx3080ti:    { vram: 12, bw: 912,  label: "RTX 3080 Ti" },
   rtx3090:      { vram: 24, bw: 936,  label: "RTX 3090" },
   rtx3090ti:    { vram: 24, bw: 1008, label: "RTX 3090 Ti" },
-  // RTX 40
   rtx4060:      { vram: 8,  bw: 272,  label: "RTX 4060" },
   rtx4060ti8:   { vram: 8,  bw: 288,  label: "RTX 4060 Ti 8GB" },
   rtx4060ti16:  { vram: 16, bw: 288,  label: "RTX 4060 Ti 16GB" },
@@ -806,37 +793,32 @@ const GPU_SPECS = {
   rtx4080:      { vram: 16, bw: 717,  label: "RTX 4080" },
   rtx4080s:     { vram: 16, bw: 736,  label: "RTX 4080 Super" },
   rtx4090:      { vram: 24, bw: 1008, label: "RTX 4090" },
-  // RTX 50
   rtx5070:      { vram: 12, bw: 672,  label: "RTX 5070" },
   rtx5070ti:    { vram: 16, bw: 896,  label: "RTX 5070 Ti" },
   rtx5080:      { vram: 16, bw: 960,  label: "RTX 5080" },
   rtx5090:      { vram: 32, bw: 1792, label: "RTX 5090" },
-  // AMD RX 6000
   rx6600:       { vram: 8,  bw: 224,  label: "RX 6600" },
   rx6600xt:     { vram: 8,  bw: 256,  label: "RX 6600 XT" },
   rx6700xt:     { vram: 12, bw: 384,  label: "RX 6700 XT" },
   rx6800:       { vram: 16, bw: 512,  label: "RX 6800" },
   rx6800xt:     { vram: 16, bw: 512,  label: "RX 6800 XT" },
   rx6900xt:     { vram: 16, bw: 512,  label: "RX 6900 XT" },
-  // AMD RX 7000
   rx7600:       { vram: 8,  bw: 288,  label: "RX 7600" },
   rx7700xt:     { vram: 12, bw: 432,  label: "RX 7700 XT" },
   rx7800xt:     { vram: 16, bw: 576,  label: "RX 7800 XT" },
   rx7900gre:    { vram: 16, bw: 576,  label: "RX 7900 GRE" },
   rx7900xt:     { vram: 20, bw: 800,  label: "RX 7900 XT" },
   rx7900xtx:    { vram: 24, bw: 960,  label: "RX 7900 XTX" },
-  // Intel Arc
   arc_a770:     { vram: 16, bw: 560,  label: "Arc A770" },
   arc_b580:     { vram: 12, bw: 456,  label: "Arc B580" },
-  // Workstation / DGX legacy keys
   nvidia_high:  { vram: 80, bw: 2000, label: "Workstation GPU" },
+  nvidia_mid:   { vram: 48, bw: 900,  label: "Mid-range Workstation GPU" },
+  nvidia_low:   { vram: 8,  bw: 200,  label: "Jetson Orin Nano" },
 };
 
-// Estimate tok/s for a model given hardware
-// Formula: bandwidth_GBs / (params_B * bytes_per_param) * efficiency
 function estimateTokPerSec(modelParamsB, gpuKey, ram, vram) {
   const spec = GPU_SPECS[gpuKey] || GPU_SPECS['none'];
-  const bpw = 0.5; // Q4 ≈ 0.5 bytes per weight
+  const bpw = 0.5;
   const modelSizeGB = modelParamsB * bpw;
   const effectiveVram = gpuKey === 'apple_silicon' ? ram : (spec.vram || vram);
   const fitsInVram = effectiveVram >= modelSizeGB;
@@ -844,20 +826,16 @@ function estimateTokPerSec(modelParamsB, gpuKey, ram, vram) {
 
   let tps;
   if (gpuKey === 'none') {
-    // CPU estimate: ~1 GB/s effective throughput, very rough
-    const cpuBw = Math.max(30, ram * 2); // DDR5 ~50-100 GB/s effective
+    const cpuBw = Math.max(30, ram * 2);
     tps = (cpuBw * 0.15) / (modelSizeGB);
   } else if (fitsInVram) {
-    // Fully GPU: bw / modelSize * efficiency
     tps = (bw * 0.7) / modelSizeGB;
   } else {
-    // Partial offload: slower
     tps = (bw * 0.2) / modelSizeGB;
   }
   return Math.max(0.5, Math.round(tps * 10) / 10);
 }
 
-// ===== MODEL DATABASE =====
 const MODELS = [
   { name: "Llama 3.2 1B", desc: "Tiny but capable. Great for edge devices and simple tasks.", minRam: 2, minVram: 0, minCores: 2, minStorage: 2, params: "1B", paramsB: 1, category: "Tiny", tags: ["chat","summarize"] },
   { name: "Llama 3.2 3B", desc: "Small, fast, surprisingly capable for everyday tasks.", minRam: 4, minVram: 0, minCores: 2, minStorage: 3, params: "3B", paramsB: 3, category: "Small", tags: ["chat"] },
@@ -883,7 +861,7 @@ const MODELS = [
   { name: "Flux.1 Schnell", desc: "Black Forest's fast diffusion model — stunning image quality.", minRam: 12, minVram: 8, minCores: 6, minStorage: 10, params: "12B", paramsB: 12, category: "Image Gen", tags: ["image"] },
 ];
 
-// ===== PRESET MACHINES =====
+
 const PRESETS = [
   {
     id: "rpi4", icon: "🥧", name: "Raspberry Pi 4", sub: "ARM Cortex-A72",
@@ -1021,7 +999,6 @@ const PRESETS = [
 let currentPreset = null;
 let currentFilter = 'all';
 
-// ===== RENDER PRESETS =====
 function renderPresets() {
   const grid = document.getElementById('presetGrid');
   grid.innerHTML = PRESETS.map(p => `
@@ -1033,7 +1010,6 @@ function renderPresets() {
   `).join('');
 }
 
-// ===== MODAL =====
 function openPresetModal(id) {
   currentPreset = PRESETS.find(p => p.id === id);
   if (!currentPreset) return;
@@ -1080,7 +1056,6 @@ function applyPreset() {
   if (gpuEl && p.gpuMap) gpu = p.gpuMap[gpuEl.value] || gpu;
   else if (chipVal && p.gpuMap) gpu = p.gpuMap[chipVal] || gpu;
 
-  // Derive VRAM from GPU_SPECS
   const gpuSpec = GPU_SPECS[gpu] || { vram: 0 };
   const vram = gpu === 'apple_silicon' ? 0 : gpuSpec.vram;
 
@@ -1095,7 +1070,6 @@ function applyPreset() {
   let finalRam = ram;
   if (!ramEl && chipVal && p.ramMap) finalRam = p.ramMap[chipVal] || finalRam;
 
-  // Also handle DGX ram/vram from chip
   const vramFromChip = chipVal && p.vramMap ? (p.vramMap[chipVal] || vram) : vram;
   const ramFromChip = chipVal && p.ramMap ? (p.ramMap[chipVal] || finalRam) : finalRam;
 
@@ -1109,7 +1083,6 @@ function applyPreset() {
   checkSpecs();
 }
 
-// ===== CHECK SPECS =====
 function checkSpecs() {
   const ram = parseFloat(document.getElementById('ram').value) || 0;
   const vram = parseFloat(document.getElementById('vram').value) || 0;
@@ -1117,12 +1090,19 @@ function checkSpecs() {
   const storage = parseFloat(document.getElementById('storage').value) || 0;
   const gpu = document.getElementById('gpu').value;
 
-  if (!ram) {
-    alert('Please enter at least your RAM amount!');
+  if (!ram || ram <= 0) {
+    alert('Please enter a valid RAM amount (greater than 0)!');
+    return;
+  }
+  if (!storage || storage <= 0) {
+    alert('Please enter a valid storage amount (greater than 0)!');
+    return;
+  }
+  if (!cores || cores <= 0) {
+    alert('Please enter a valid CPU core count (greater than 0)!');
     return;
   }
 
-  // Get effective VRAM from GPU_SPECS if a named GPU is selected
   const gpuSpec = GPU_SPECS[gpu];
   const effectiveVram = gpuSpec ? (gpu === 'apple_silicon' ? 0 : gpuSpec.vram) : vram;
   const effectiveRam = ram;
@@ -1213,7 +1193,6 @@ function filterModels(f, btn) {
   renderModelCards(window._allResults || []);
 }
 
-// ===== CPU CHANGE HANDLER =====
 function onCpuChange() {
   const sel = document.getElementById('cpu');
   const opt = sel.options[sel.selectedIndex];
@@ -1221,14 +1200,12 @@ function onCpuChange() {
   if (cores) {
     document.getElementById('cores').value = cores;
   }
-  // Auto-set GPU to Apple Silicon if Apple CPU selected
   const val = sel.value;
   if (val.startsWith('m1') || val.startsWith('m2') || val.startsWith('m3') || val.startsWith('m4')) {
     document.getElementById('gpu').value = 'apple_silicon';
   }
 }
 
-// ===== INIT =====
 renderPresets();
 </script>
 </body>
